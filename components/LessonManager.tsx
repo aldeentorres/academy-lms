@@ -10,10 +10,10 @@ interface Lesson {
   id: string;
   title: string;
   slug: string;
-  description?: string;
+  description?: string | null;
   order: number;
-  videoUrl?: string;
-  content?: string;
+  videoUrl?: string | null;
+  content?: string | null;
   isPublished: boolean;
   quiz?: any;
   assignment?: any;
