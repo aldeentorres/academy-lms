@@ -1,0 +1,183 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String   // Hashed password
+  role      String   @default("admin") // "admin" only - dashboard access
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Agent {
+  id          String      @id @default(cuid())
+  email       String      @unique
+  name        String
+  slug        String      @unique
+  photo       String?     // Profile photo URL
+  password    String?     // Optional - will use API auth later
+  apiId       String?     // ID from external API
+  submissions Submission[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model Country {
+  id        String   @id @default(cuid())
+  code      String   @unique // ISO country code (e.g., "US", "GB", "IN")
+  name      String
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  slug      String   @unique
+  description String?
+  courses   Course[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String      @id @default(cuid())
+  title       String
+  slug        String      @unique
+  description String?
+  thumbnail   String?     // Image URL
+  categoryId  String
+  category    Category    @relation(fields: [categoryId], references: [id])
+  countryId   String?     // Optional - null means available in all countries
+  country     Country?    @relation(fields: [countryId], references: [id])
+  userId      String?     // Teacher who created the course
+  user        User?       @relation(fields: [userId], references: [id])
+  isPublished Boolean     @default(false)
+  lessons     Lesson[]
+  quizzes     Quiz[]
+  assignments Assignment[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@index([categoryId])
+  @@index([countryId])
+  @@index([userId])
+  @@index([isPublished])
+  @@index([createdAt])
+  @@index([updatedAt])
+}
+
+model Lesson {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  slug        String
+  description String?
+  order       Int      @default(0) // Order within course
+  videoUrl    String?  // S3Bubble video embed URL
+  content     String?  // Additional HTML content
+  isPublished Boolean  @default(true)
+  quiz        Quiz?    @relation("LessonQuiz")
+  assignment  Assignment? @relation("LessonAssignment")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([courseId, slug])
+  @@index([courseId])
+  @@index([order])
+  @@index([isPublished])
+}
+
+model Quiz {
+  id          String     @id @default(cuid())
+  courseId    String
+  course      Course     @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonId   String?    @unique // Optional - can be standalone or attached to lesson
+  lesson      Lesson?    @relation("LessonQuiz", fields: [lessonId], references: [id], onDelete: SetNull)
+  title       String
+  slug        String
+  description String?
+  order       Int        @default(0) // Order within course
+  isPublished Boolean    @default(true)
+  questions   Question[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@unique([courseId, slug])
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([order])
+  @@index([isPublished])
+}
+
+model Question {
+  id          String   @id @default(cuid())
+  quizId      String
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  question    String
+  type        String   // "multiple-choice", "true-false", "short-answer"
+  options     String?  // JSON string for multiple choice options
+  correctAnswer String
+  points      Int      @default(1)
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([quizId])
+}
+
+model Assignment {
+  id          String      @id @default(cuid())
+  courseId    String
+  course      Course      @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  lessonId    String?     @unique // Optional - can be standalone or attached to lesson
+  lesson      Lesson?     @relation("LessonAssignment", fields: [lessonId], references: [id], onDelete: SetNull)
+  title       String
+  slug        String
+  description String
+  order       Int         @default(0) // Order within course
+  dueDate     DateTime?
+  maxPoints   Int         @default(100)
+  isPublished Boolean     @default(true)
+  submissions Submission[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  @@unique([courseId, slug])
+  @@index([courseId])
+  @@index([lessonId])
+  @@index([order])
+  @@index([isPublished])
+}
+
+model Submission {
+  id          String     @id @default(cuid())
+  assignmentId String
+  assignment  Assignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  agentId     String?    // Agent (student) who submitted
+  agent       Agent?     @relation(fields: [agentId], references: [id])
+  content     String     // Submission text/content
+  fileUrl     String?    // URL to uploaded file
+  score       Int?
+  feedback    String?
+  submittedAt DateTime   @default(now())
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  @@index([assignmentId])
+  @@index([agentId])
+}

@@ -1,0 +1,45 @@
+{
+  "name": "lms-platform",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:seed-admin": "tsx prisma/seed-admin.ts",
+    "db:seed-test": "tsx prisma/seed-s3bubble-test.ts",
+    "db:seed-sample": "tsx prisma/seed-sample-data.ts",
+    "db:seed-empty": "tsx prisma/seed-empty-data.ts",
+    "db:seed-agent-passwords": "tsx prisma/seed-agent-passwords.ts",
+    "get-agent-id": "tsx scripts/get-agent-id.ts",
+    "add-agent-slugs": "tsx scripts/add-slugs-to-agents.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.19.0",
+    "bcryptjs": "^2.4.3",
+    "hls.js": "^1.6.15",
+    "next": "^16.1.1",
+    "next-auth": "^4.24.5",
+    "prisma": "^5.19.0",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/node": "^20.14.0",
+    "@types/react": "^18.3.0",
+    "@types/react-dom": "^18.3.0",
+    "autoprefixer": "^10.4.0",
+    "eslint": "^9.0.0",
+    "eslint-config-next": "^16.1.1",
+    "postcss": "^8.4.0",
+    "tailwindcss": "^3.4.0",
+    "tsx": "^4.7.0",
+    "typescript": "^5.5.0"
+  }
+}
