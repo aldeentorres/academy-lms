@@ -3,11 +3,12 @@ import { prisma } from '@/lib/prisma';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const lesson = await prisma.lesson.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         course: true,
         quiz: {
@@ -38,14 +39,15 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { title, slug, description, videoUrl, content, order, isPublished } = body;
 
     const existingLesson = await prisma.lesson.findUnique({
-      where: { id: params.id },
+      where: { id },
     });
 
     if (!existingLesson) {
@@ -75,7 +77,7 @@ export async function PUT(
     }
 
     const lesson = await prisma.lesson.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         title,
         slug,
@@ -99,11 +101,12 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     await prisma.lesson.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });

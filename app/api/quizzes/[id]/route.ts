@@ -4,11 +4,12 @@ import { requireAdmin } from '@/lib/auth';
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const quiz = await prisma.quiz.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         questions: {
           orderBy: { order: 'asc' },
@@ -32,29 +33,30 @@ export async function GET(
 
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
+    const { id } = await params;
     const body = await request.json();
     const { title, questions } = body;
 
     // Update quiz title
     const quiz = await prisma.quiz.update({
-      where: { id: params.id },
+      where: { id },
       data: { title },
     });
 
     // Delete existing questions
     await prisma.question.deleteMany({
-      where: { quizId: params.id },
+      where: { quizId: id },
     });
 
     // Create new questions
     if (questions && questions.length > 0) {
       await prisma.question.createMany({
         data: questions.map((q: any) => ({
-          quizId: params.id,
+          quizId: id,
           question: q.question,
           type: q.type,
           options: q.options,
@@ -67,7 +69,7 @@ export async function PUT(
 
     // Fetch updated quiz
     const updatedQuiz = await prisma.quiz.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         questions: {
           orderBy: { order: 'asc' },
@@ -93,12 +95,13 @@ export async function PUT(
 
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     await requireAdmin();
+    const { id } = await params;
     await prisma.quiz.delete({
-      where: { id: params.id },
+      where: { id },
     });
 
     return NextResponse.json({ success: true });
