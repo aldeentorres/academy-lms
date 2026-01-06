@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, Course } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
@@ -97,34 +97,6 @@ async function main() {
             videoUrl: 'https://example.s3bubble.com/video1', // Replace with actual S3Bubble URL
             content: '<p>HTML is the foundation of web development...</p>',
             isPublished: true,
-            quiz: {
-              create: {
-                title: 'HTML Basics Quiz',
-                questions: {
-                  create: [
-                    {
-                      question: 'What does HTML stand for?',
-                      type: 'multiple-choice',
-                      options: JSON.stringify([
-                        'HyperText Markup Language',
-                        'High Tech Modern Language',
-                        'Home Tool Markup Language',
-                      ]),
-                      correctAnswer: 'HyperText Markup Language',
-                      points: 5,
-                      order: 1,
-                    },
-                    {
-                      question: 'HTML is a programming language.',
-                      type: 'true-false',
-                      correctAnswer: 'False',
-                      points: 3,
-                      order: 2,
-                    },
-                  ],
-                },
-              },
-            },
           },
           {
             title: 'CSS Styling Fundamentals',
@@ -134,21 +106,70 @@ async function main() {
             videoUrl: 'https://example.s3bubble.com/video2', // Replace with actual S3Bubble URL
             content: '<p>CSS allows you to style your HTML elements...</p>',
             isPublished: true,
-            assignment: {
-              create: {
-                title: 'Create a Styled Web Page',
-                description: 'Create a simple web page using HTML and CSS. Include at least 3 different styled elements.',
-                maxPoints: 100,
-                dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
-              },
-            },
           },
         ],
       },
     },
+    include: {
+      lessons: true,
+    },
   });
 
   console.log('Created course:', course.title);
+
+  // Create quiz for the first lesson
+  const lesson1 = course.lessons.find(l => l.slug === 'getting-started-with-html');
+  if (lesson1) {
+    await prisma.quiz.create({
+      data: {
+        courseId: course.id,
+        lessonId: lesson1.id,
+        title: 'HTML Basics Quiz',
+        slug: 'html-basics-quiz',
+        questions: {
+          create: [
+            {
+              question: 'What does HTML stand for?',
+              type: 'multiple-choice',
+              options: JSON.stringify([
+                'HyperText Markup Language',
+                'High Tech Modern Language',
+                'Home Tool Markup Language',
+              ]),
+              correctAnswer: 'HyperText Markup Language',
+              points: 5,
+              order: 1,
+            },
+            {
+              question: 'HTML is a programming language.',
+              type: 'true-false',
+              correctAnswer: 'False',
+              points: 3,
+              order: 2,
+            },
+          ],
+        },
+      },
+    });
+  }
+
+  // Create assignment for the second lesson
+  const lesson2 = course.lessons.find(l => l.slug === 'css-styling-fundamentals');
+  if (lesson2) {
+    await prisma.assignment.create({
+      data: {
+        courseId: course.id,
+        lessonId: lesson2.id,
+        title: 'Create a Styled Web Page',
+        slug: 'create-a-styled-web-page',
+        description: 'Create a simple web page using HTML and CSS. Include at least 3 different styled elements.',
+        maxPoints: 100,
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        order: 2,
+        isPublished: true,
+      },
+    });
+  }
 
   // Create another course for a different country
   const course2 = await prisma.course.upsert({

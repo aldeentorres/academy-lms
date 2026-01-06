@@ -2,6 +2,14 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
+// Helper function to generate slug from name
+const generateSlug = (name: string) => {
+  return name
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+};
+
 async function main() {
   console.log('🌱 Seeding sample data...');
 
@@ -102,8 +110,10 @@ async function main() {
   // Create sample quiz for lesson 1
   const quiz1 = await prisma.quiz.create({
     data: {
+      courseId: course.id,
       lessonId: lesson1.id,
       title: 'Property Types Quiz',
+      slug: generateSlug('Property Types Quiz'),
       questions: {
         create: [
           {
@@ -136,8 +146,10 @@ async function main() {
   // Create sample quiz for lesson 2
   const quiz2 = await prisma.quiz.create({
     data: {
+      courseId: course.id,
       lessonId: lesson2.id,
       title: 'Market Analysis Quiz',
+      slug: generateSlug('Market Analysis Quiz'),
       questions: {
         create: [
           {
@@ -163,8 +175,10 @@ async function main() {
   // Create sample assignments
   const assignment1 = await prisma.assignment.create({
     data: {
+      courseId: course.id,
       lessonId: lesson1.id,
       title: 'Property Type Research Assignment',
+      slug: generateSlug('Property Type Research Assignment'),
       description: 'Research and write a 500-word report on three different property types in your local market. Include pricing, features, and target demographics.',
       dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
       maxPoints: 100,
@@ -173,8 +187,10 @@ async function main() {
 
   const assignment2 = await prisma.assignment.create({
     data: {
+      courseId: course.id,
       lessonId: lesson2.id,
       title: 'Market Analysis Project',
+      slug: generateSlug('Market Analysis Project'),
       description: 'Conduct a market analysis for a property in your area. Create a report with comparable properties, pricing trends, and recommendations.',
       dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
       maxPoints: 150,
@@ -183,23 +199,17 @@ async function main() {
 
   const assignment3 = await prisma.assignment.create({
     data: {
+      courseId: course.id,
       lessonId: lesson3.id,
       title: 'Client Communication Role Play',
+      slug: generateSlug('Client Communication Role Play'),
       description: 'Record a 10-minute role-play session demonstrating effective client communication. Submit the recording and a written reflection.',
       dueDate: new Date(Date.now() + 10 * 24 * 60 * 60 * 1000), // 10 days from now
       maxPoints: 120,
     },
   });
 
-  // Helper function to generate slug from name
-  const generateSlug = (name: string) => {
-    return name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
-  };
-
-  // Create sample agent
+  // Create sample assignments
   const agent = await prisma.agent.upsert({
     where: { email: 'agent@example.com' },
     update: {},

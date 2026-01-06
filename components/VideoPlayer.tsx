@@ -47,8 +47,6 @@ export default function VideoPlayer({ videoUrl, title }: VideoPlayerProps) {
               // Handle CORS - don't send credentials
               xhr.withCredentials = false;
             },
-            // Additional CORS configuration
-            cors: true,
           });
           
           hls.loadSource(videoUrl);
