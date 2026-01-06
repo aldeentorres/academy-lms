@@ -20,7 +20,7 @@ async function createTables() {
     const envContent = readFileSync(envPath, 'utf-8');
     const envVars: Record<string, string> = {};
     
-    envContent.split('\n').forEach(line => {
+    envContent.split('\n').forEach((line: string) => {
       const match = line.match(/^([^=]+)="?([^"]+)"?$/);
       if (match) {
         envVars[match[1].trim()] = match[2].trim();
