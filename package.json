@@ -18,6 +18,7 @@
     "db:seed-sample": "tsx prisma/seed-sample-data.ts",
     "db:seed-empty": "tsx prisma/seed-empty-data.ts",
     "db:seed-agent-passwords": "tsx prisma/seed-agent-passwords.ts",
+    "db:seed-production": "tsx prisma/seed-production.ts",
     "get-agent-id": "tsx scripts/get-agent-id.ts",
     "add-agent-slugs": "tsx scripts/add-slugs-to-agents.ts"
   },
