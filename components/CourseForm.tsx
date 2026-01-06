@@ -33,13 +33,21 @@ interface CourseFormProps {
 export default function CourseForm({ categories, countries, course }: CourseFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<{
+    title: string;
+    slug: string;
+    description: string;
+    thumbnail: string;
+    categoryId: string;
+    countryId: string | undefined;
+    isPublished: boolean;
+  }>({
     title: course?.title || '',
     slug: course?.slug || '',
     description: course?.description || '',
     thumbnail: course?.thumbnail || '',
     categoryId: course?.categoryId || categories[0]?.id || '',
-    countryId: course?.countryId || '',
+    countryId: course?.countryId || undefined,
     isPublished: course?.isPublished || false,
   });
 
@@ -70,12 +78,18 @@ export default function CourseForm({ categories, countries, course }: CourseForm
       
       const method = course ? 'PUT' : 'POST';
 
+      // Prepare data for API - convert undefined countryId to null
+      const apiData = {
+        ...formData,
+        countryId: formData.countryId || null,
+      };
+
       const response = await fetch(url, {
         method,
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify(apiData),
       });
 
       if (!response.ok) {
@@ -188,7 +202,7 @@ export default function CourseForm({ categories, countries, course }: CourseForm
           </label>
           <select
             id="countryId"
-            value={formData.countryId}
+            value={formData.countryId || ''}
             onChange={(e) => setFormData({ ...formData, countryId: e.target.value || undefined })}
             className="w-full border border-gray-300 rounded-md px-4 py-2 text-gray-900 bg-white focus:ring-primary-500 focus:border-primary-500"
           >
