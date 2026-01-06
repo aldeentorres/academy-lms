@@ -2,6 +2,8 @@ import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 import CoursesList from '@/components/CoursesList';
 
+export const dynamic = 'force-dynamic';
+
 async function getCourses(page: number = 1, limit: number = 20) {
   try {
     const skip = (page - 1) * limit;

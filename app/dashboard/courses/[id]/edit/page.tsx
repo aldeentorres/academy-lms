@@ -3,6 +3,8 @@ import LessonManager from '@/components/LessonManager';
 import { prisma } from '@/lib/prisma';
 import { notFound } from 'next/navigation';
 
+export const dynamic = 'force-dynamic';
+
 async function getCourse(id: string) {
   try {
     const course = await prisma.course.findUnique({
@@ -30,12 +32,17 @@ async function getCourse(id: string) {
 }
 
 async function getFormData() {
-  const [categories, countries] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: 'asc' } }),
-    prisma.country.findMany({ orderBy: { name: 'asc' } }),
-  ]);
+  try {
+    const [categories, countries] = await Promise.all([
+      prisma.category.findMany({ orderBy: { name: 'asc' } }),
+      prisma.country.findMany({ orderBy: { name: 'asc' } }),
+    ]);
 
-  return { categories, countries };
+    return { categories, countries };
+  } catch (error) {
+    console.error('Error fetching form data:', error);
+    return { categories: [], countries: [] };
+  }
 }
 
 export default async function EditCoursePage({

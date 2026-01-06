@@ -1,13 +1,21 @@
 import CourseForm from '@/components/CourseForm';
 import { prisma } from '@/lib/prisma';
 
-async function getFormData() {
-  const [categories, countries] = await Promise.all([
-    prisma.category.findMany({ orderBy: { name: 'asc' } }),
-    prisma.country.findMany({ orderBy: { name: 'asc' } }),
-  ]);
+export const dynamic = 'force-dynamic';
 
-  return { categories, countries };
+async function getFormData() {
+  try {
+    const [categories, countries] = await Promise.all([
+      prisma.category.findMany({ orderBy: { name: 'asc' } }),
+      prisma.country.findMany({ orderBy: { name: 'asc' } }),
+    ]);
+
+    return { categories, countries };
+  } catch (error) {
+    console.error('Error fetching form data:', error);
+    // Return empty arrays if database is not available
+    return { categories: [], countries: [] };
+  }
 }
 
 export default async function NewCoursePage() {
