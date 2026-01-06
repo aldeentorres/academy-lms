@@ -32,26 +32,70 @@
 1. **Go to Vercel Dashboard**: https://vercel.com/new
 2. **Import your GitHub repository**
 3. **Configure Project**:
-   - Framework Preset: Next.js
+   - Framework Preset: Next.js (auto-detected)
    - Root Directory: `./` (default)
    - Build Command: `npm run build` (default)
    - Output Directory: `.next` (default)
    - Install Command: `npm install` (default)
+4. **Click "Deploy"** (you can add environment variables after the first deployment)
 
 ### Step 3: Configure Environment Variables
 
-In Vercel Dashboard → Settings → Environment Variables, add:
+**Important:** Add these **AFTER** your first deployment, or the build will fail.
 
-```
-NEXTAUTH_SECRET=your-production-secret-key
-NEXTAUTH_URL=https://your-app.vercel.app
-DATABASE_URL=your-postgresql-connection-string (if using PostgreSQL)
-```
+1. Go to your project in Vercel Dashboard
+2. Navigate to **Settings** → **Environment Variables**
+3. Add each variable below:
 
-**Generate NEXTAUTH_SECRET**:
+#### 1. NEXTAUTH_SECRET (Required)
+**Where to get it:** Generate it yourself using this command:
 ```bash
 openssl rand -base64 32
 ```
+Or use an online generator: https://generate-secret.vercel.app/32
+
+**Example output:**
+```
+NEXTAUTH_SECRET=AbCdEfGhIjKlMnOpQrStUvWxYz1234567890+=
+```
+
+#### 2. NEXTAUTH_URL (Required)
+**Where to get it:** This is your Vercel deployment URL
+- After deploying to Vercel, you'll get a URL like: `https://your-app-name.vercel.app`
+- Use that exact URL (including `https://`)
+- If you add a custom domain later, update this to your custom domain
+
+**Example:**
+```
+NEXTAUTH_URL=https://academy-lms.vercel.app
+```
+
+#### 3. DATABASE_URL (Optional - Only if using PostgreSQL)
+**Where to get it:** From your PostgreSQL provider
+
+**Option A: Vercel Postgres (Recommended)**
+1. Go to Vercel Dashboard → Storage → Create Database → Postgres
+2. After creation, go to Settings → Connection String
+3. Copy the `POSTGRES_URL` - this is your `DATABASE_URL`
+
+**Option B: Supabase (Free tier available)**
+1. Go to https://supabase.com
+2. Create a new project
+3. Go to Settings → Database
+4. Copy the "Connection string" under "Connection pooling"
+5. Format: `postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres`
+
+**Option C: Other PostgreSQL Providers**
+- Railway: https://railway.app (Dashboard → Database → Connection String)
+- Neon: https://neon.tech (Dashboard → Connection String)
+- AWS RDS, Google Cloud SQL, etc.
+
+**Example format:**
+```
+DATABASE_URL=postgresql://user:password@host:5432/database?sslmode=require
+```
+
+**Note:** If you're using SQLite for development, you don't need `DATABASE_URL` in production either, but PostgreSQL is strongly recommended for production.
 
 ### Step 4: Database Setup
 
