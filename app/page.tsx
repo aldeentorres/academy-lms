@@ -15,9 +15,21 @@ async function getCourses() {
       take: 6,
       orderBy: { createdAt: "desc" },
     });
+    
+    // Log for debugging in production
+    if (process.env.NODE_ENV === 'production') {
+      console.log(`[Home Page] Found ${courses.length} published courses`);
+    }
+    
     return courses;
-  } catch (error) {
+  } catch (error: any) {
+    // Better error logging
     console.error("Error fetching courses:", error);
+    console.error("Error details:", {
+      message: error?.message,
+      code: error?.code,
+      meta: error?.meta,
+    });
     return [];
   }
 }
