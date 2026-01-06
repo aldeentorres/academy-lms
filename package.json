@@ -4,8 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:clean": "rm -rf .next node_modules/.cache && next build",
+    "build": "prisma generate && next build",
+    "build:clean": "rm -rf .next node_modules/.cache && prisma generate && next build",
+    "postinstall": "prisma generate",
     "start": "next start",
     "lint": "next lint",
     "db:generate": "prisma generate",
