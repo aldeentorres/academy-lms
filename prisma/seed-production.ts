@@ -164,8 +164,15 @@ async function main() {
   });
 
   // Add lessons to course 1
-  const lesson1 = await prisma.lesson.create({
-    data: {
+  const lesson1 = await prisma.lesson.upsert({
+    where: {
+      courseId_slug: {
+        courseId: course1.id,
+        slug: 'introduction-to-real-estate',
+      },
+    },
+    update: {},
+    create: {
       courseId: course1.id,
       title: 'Introduction to Real Estate',
       slug: 'introduction-to-real-estate',
@@ -175,8 +182,15 @@ async function main() {
     },
   });
 
-  const lesson2 = await prisma.lesson.create({
-    data: {
+  const lesson2 = await prisma.lesson.upsert({
+    where: {
+      courseId_slug: {
+        courseId: course1.id,
+        slug: 'property-types',
+      },
+    },
+    update: {},
+    create: {
       courseId: course1.id,
       title: 'Property Types',
       slug: 'property-types',
@@ -187,8 +201,15 @@ async function main() {
   });
 
   // Add quiz to lesson 1
-  await prisma.quiz.create({
-    data: {
+  await prisma.quiz.upsert({
+    where: {
+      courseId_slug: {
+        courseId: course1.id,
+        slug: 'real-estate-basics-quiz',
+      },
+    },
+    update: {},
+    create: {
       courseId: course1.id,
       lessonId: lesson1.id,
       title: 'Real Estate Basics Quiz',
@@ -376,8 +397,15 @@ async function main() {
   console.log('📝 Creating agent submissions...');
 
   // Create some assignments first
-  const assignment1 = await prisma.assignment.create({
-    data: {
+  const assignment1 = await prisma.assignment.upsert({
+    where: {
+      courseId_slug: {
+        courseId: course1.id,
+        slug: 'property-analysis-assignment',
+      },
+    },
+    update: {},
+    create: {
       courseId: course1.id,
       lessonId: lesson2.id,
       title: 'Property Analysis Assignment',
@@ -428,13 +456,21 @@ async function main() {
     },
   ];
 
-  await Promise.all(
-    submissions.map((submission) =>
-      prisma.submission.create({
+  // Create submissions (check if they exist first to avoid duplicates)
+  for (const submission of submissions) {
+    const existing = await prisma.submission.findFirst({
+      where: {
+        agentId: submission.agentId,
+        assignmentId: submission.assignmentId,
+      },
+    });
+
+    if (!existing) {
+      await prisma.submission.create({
         data: submission,
-      })
-    )
-  );
+      });
+    }
+  }
 
   console.log(`✅ Created ${submissions.length} submissions`);
   console.log('');
