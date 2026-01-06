@@ -20,6 +20,7 @@
     "db:seed-agent-passwords": "tsx prisma/seed-agent-passwords.ts",
     "db:seed-production": "tsx prisma/seed-production.ts",
     "db:verify": "tsx scripts/verify-production-data.ts",
+    "db:fresh-setup": "bash scripts/fresh-setup.sh",
     "get-agent-id": "tsx scripts/get-agent-id.ts",
     "add-agent-slugs": "tsx scripts/add-slugs-to-agents.ts"
   },

@@ -1,6 +1,8 @@
 import { prisma } from '@/lib/prisma';
 import Link from 'next/link';
 
+export const dynamic = 'force-dynamic';
+
 // Calculate agent statistics for leaderboard
 function calculateAgentStats(submissions: any[]) {
   const gradedSubmissions = submissions.filter((s) => s.score !== null);
@@ -60,9 +62,20 @@ async function getAgentsLeaderboard() {
       return b.stats.completedAssignments - a.stats.completedAssignments;
     });
 
+    // Log for debugging (development only)
+    if (process.env.NODE_ENV === 'development') {
+      console.log(`[Agents Page] Found ${agentsWithStats.length} agents`);
+    }
+    
     return agentsWithStats;
   } catch (error) {
     console.error('Error fetching agents leaderboard:', error);
+    if (error instanceof Error) {
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+      });
+    }
     return [];
   }
 }
@@ -270,7 +283,7 @@ export default async function AgentsLeaderboardPage() {
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap text-center">
                           <Link
-                            href={`/agent/${agent.slug}`}
+                            href={`/agent/${agent.slug || agent.id}`}
                             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 transition-colors"
                           >
                             View Profile

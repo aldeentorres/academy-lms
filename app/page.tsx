@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { prisma } from "@/lib/prisma";
 
+export const dynamic = 'force-dynamic';
+
 async function getCourses() {
   try {
     const courses = await prisma.course.findMany({
@@ -16,8 +18,8 @@ async function getCourses() {
       orderBy: { createdAt: "desc" },
     });
     
-    // Log for debugging in production
-    if (process.env.NODE_ENV === 'production') {
+    // Log for debugging (development only)
+    if (process.env.NODE_ENV === 'development') {
       console.log(`[Home Page] Found ${courses.length} published courses`);
     }
     
@@ -78,7 +80,7 @@ export default async function Home() {
                   <div className="p-6">
                     <div className="flex items-center justify-between mb-2">
                       <span className="text-sm text-primary-600 font-medium">
-                        {course.category.name}
+                        {course.category?.name || 'Uncategorized'}
                       </span>
                       {course.country && (
                         <span className="text-xs text-gray-500">
